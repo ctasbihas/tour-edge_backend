@@ -3,6 +3,7 @@
 import { Server } from "http";
 import mongoose from "mongoose";
 import app from "./app";
+import { env } from "./config/env";
 
 let server: Server;
 
@@ -10,9 +11,7 @@ const PORT = 5000;
 
 const startServer = async () => {
 	try {
-		await mongoose.connect(
-			"mongodb+srv://fenzor:fenzor@projects.yc3yzra.mongodb.net/tour-edge?retryWrites=true&w=majority&appName=projects"
-		);
+		await mongoose.connect(env.MONGO_URI);
 		console.log("Connected to MongoDB");
 
 		server = app.listen(PORT, () => {
