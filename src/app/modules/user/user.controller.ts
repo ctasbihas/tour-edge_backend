@@ -1,11 +1,21 @@
 import { NextFunction, Request, Response } from "express";
-import AppError from "../../errorHelpers/AppError";
 import { UserServices } from "./user.service";
 
+const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const users = await UserServices.getAllUsers();
+
+		res.status(200).json({
+			success: true,
+			message: "Users retrieved successfully",
+			users,
+		});
+	} catch (error) {
+		next(error);
+	}
+};
 const createUser = async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		throw new AppError(400, "This is a custom error message");
-
 		const user = await UserServices.createUser(req.body);
 
 		return res.status(201).json({
@@ -20,4 +30,5 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
 
 export const UserControllers = {
 	createUser,
+	getAllUsers,
 };
