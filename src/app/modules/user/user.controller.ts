@@ -1,32 +1,25 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
+import { catchAsync } from "../../utils/catchAsync";
 import { UserServices } from "./user.service";
 
-const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
-	try {
-		const users = await UserServices.getAllUsers();
+const getAllUsers = catchAsync(async (req: Request, res: Response) => {
+	const users = await UserServices.getAllUsers();
 
-		res.status(200).json({
-			success: true,
-			message: "Users retrieved successfully",
-			users,
-		});
-	} catch (error) {
-		next(error);
-	}
-};
-const createUser = async (req: Request, res: Response, next: NextFunction) => {
-	try {
-		const user = await UserServices.createUser(req.body);
+	res.status(200).json({
+		success: true,
+		message: "Users retrieved successfully",
+		users,
+	});
+});
+const createUser = catchAsync(async (req: Request, res: Response) => {
+	const user = await UserServices.createUser(req.body);
 
-		return res.status(201).json({
-			success: true,
-			message: "User registered successfully",
-			user,
-		});
-	} catch (error) {
-		next(error);
-	}
-};
+	res.status(201).json({
+		success: true,
+		message: "User registered successfully",
+		user,
+	});
+});
 
 export const UserControllers = {
 	createUser,
