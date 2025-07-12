@@ -3,7 +3,7 @@
 import { Server } from "http";
 import mongoose from "mongoose";
 import app from "./app";
-import { env } from "./config/env";
+import { env } from "./app/config/env";
 
 let server: Server;
 
