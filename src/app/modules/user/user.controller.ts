@@ -1,23 +1,29 @@
 import { Request, Response } from "express";
 import { catchAsync } from "../../utils/catchAsync";
+import sendResponse from "../../utils/response";
 import { UserServices } from "./user.service";
 
 const getAllUsers = catchAsync(async (req: Request, res: Response) => {
-	const users = await UserServices.getAllUsers();
+	const result = await UserServices.getAllUsers();
 
-	res.status(200).json({
+	sendResponse(res, {
+		statusCode: 200,
 		success: true,
 		message: "Users retrieved successfully",
-		users,
+		meta: {
+			total: result.meta.total,
+		},
+		data: result.data,
 	});
 });
 const createUser = catchAsync(async (req: Request, res: Response) => {
 	const user = await UserServices.createUser(req.body);
 
-	res.status(201).json({
+	sendResponse(res, {
+		statusCode: 201,
 		success: true,
-		message: "User registered successfully",
-		user,
+		message: "User created successfully",
+		data: user,
 	});
 });
 
