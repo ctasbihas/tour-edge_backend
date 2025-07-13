@@ -5,11 +5,11 @@ import { createUserZodSchema } from "./user.validation";
 
 const router = Router();
 
-router.get(
-	"/",
+router.get("/", UserControllers.getAllUsers);
+router.post(
+	"/register",
 	validateRequest(createUserZodSchema),
-	UserControllers.getAllUsers
+	UserControllers.createUser
 );
-router.post("/register", UserControllers.createUser);
 
 export const UserRoutes = router;
