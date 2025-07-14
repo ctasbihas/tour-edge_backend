@@ -24,6 +24,26 @@ const startServer = async () => {
 
 startServer();
 
+process.on("SIGTERM", () => {
+	console.log("SIGTERM received, shutting down gracefully...");
+	if (server) {
+		server.close(() => {
+			process.exit(1);
+		});
+	} else {
+		process.exit(1);
+	}
+});
+process.on("SIGINT", () => {
+	console.log("SIGTERM received, shutting down gracefully...");
+	if (server) {
+		server.close(() => {
+			process.exit(1);
+		});
+	} else {
+		process.exit(1);
+	}
+});
 process.on("unhandledRejection", () => {
 	console.error("Unhandled Rejection, shutting down server...");
 	if (server) {
@@ -42,16 +62,5 @@ process.on("uncaughtException", (error) => {
 		});
 	} else {
 		process.exit(1);
-	}
-});
-process.on("SIGTERM", () => {
-	console.log("SIGTERM received, shutting down gracefully...");
-	if (server) {
-		server.close(() => {
-			console.log("Server closed");
-			process.exit(0);
-		});
-	} else {
-		process.exit(0);
 	}
 });

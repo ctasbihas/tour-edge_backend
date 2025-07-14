@@ -1,4 +1,5 @@
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 import AppError from "../../errorHelpers/AppError";
 import { IUser } from "../user/user.interface";
 import { User } from "../user/user.model";
@@ -22,8 +23,16 @@ const credentialsLogin = async (payload: Partial<IUser>) => {
 		throw new AppError(401, "Invalid password");
 	}
 
+	const accessToken = jwt.sign(
+		{ id: user._id, email: user.email, role: user.role },
+		"process.env.JWT_SECRET as string",
+		{
+			expiresIn: "1h",
+		}
+	);
+
 	return {
-		email: user.email,
+		accessToken,
 	};
 };
 
