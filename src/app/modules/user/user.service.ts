@@ -1,4 +1,5 @@
 import bcrypt from "bcryptjs";
+import { env } from "../../config/env";
 import AppError from "../../errorHelpers/AppError";
 import { IAuthProvider, IUser } from "./user.interface";
 import { User } from "./user.model";
@@ -21,7 +22,10 @@ const createUser = async (payload: Partial<IUser>) => {
 		throw new AppError(409, "User already exists with this email");
 	}
 
-	const hashedPassword = await bcrypt.hash(password as string, 10);
+	const hashedPassword = await bcrypt.hash(
+		password as string,
+		Number(env.BCRYPT_SALT_ROUNDS)
+	);
 	const authProvider: IAuthProvider = {
 		provider: password ? "credentials" : "google",
 		providerId: email as string,
