@@ -16,6 +16,7 @@ export const checkAuth = (...roles: Partial<UserRole>[]) => {
 				throw new AppError(403, "Unauthorized access");
 			}
 
+			req.user = tokenData;
 			next();
 		} catch (err) {
 			next(err);

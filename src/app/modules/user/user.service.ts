@@ -79,6 +79,14 @@ const updateUser = async (
 			Number(env.BCRYPT_SALT_ROUNDS)
 		);
 	}
+	if (payload.isDeleted || payload.isVerified || payload.userStatus) {
+		if ([UserRole.USER, UserRole.GUIDE].includes(decodedToken.role)) {
+			throw new AppError(
+				403,
+				"You are not authorized to update user status or verification"
+			);
+		}
+	}
 
 	const updatedUser = await User.findByIdAndUpdate(userId, payload, {
 		new: true,
