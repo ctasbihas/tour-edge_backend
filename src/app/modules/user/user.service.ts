@@ -1,7 +1,8 @@
 import bcrypt from "bcryptjs";
+import { JwtPayload } from "jsonwebtoken";
 import { env } from "../../config/env";
 import AppError from "../../errorHelpers/AppError";
-import { IAuthProvider, IUser } from "./user.interface";
+import { IAuthProvider, IUser, UserRole } from "./user.interface";
 import { User } from "./user.model";
 
 const getAllUsers = async () => {
@@ -39,8 +40,56 @@ const createUser = async (payload: Partial<IUser>) => {
 	});
 	return user;
 };
+const updateUser = async (
+	userId: string,
+	payload: Partial<IUser>,
+	decodedToken: JwtPayload
+) => {
+	const user = await User.findById(userId);
+	if (!user) {
+		throw new AppError(404, "User not found");
+	}
+
+	if (payload.role) {
+		if ([UserRole.USER, UserRole.GUIDE].includes(decodedToken.role)) {
+			throw new AppError(
+				403,
+				"You are not authorized to update user roles"
+			);
+		}
+
+		if (decodedToken.role === UserRole.ADMIN) {
+			if (payload.role === UserRole.SUPER_ADMIN) {
+				throw new AppError(
+					403,
+					"You are not authorized to update user to super admin"
+				);
+			}
+			if (user.role === UserRole.SUPER_ADMIN) {
+				throw new AppError(
+					403,
+					"You are not authorized to update super admin user"
+				);
+			}
+		}
+	}
+	if (payload.password) {
+		payload.password = await bcrypt.hash(
+			payload.password as string,
+			Number(env.BCRYPT_SALT_ROUNDS)
+		);
+	}
+
+	const updatedUser = await User.findByIdAndUpdate(userId, payload, {
+		new: true,
+		runValidators: true,
+	});
+
+	return updatedUser;
+};
 
 export const UserServices = {
 	createUser,
 	getAllUsers,
+	updateUser,
 };

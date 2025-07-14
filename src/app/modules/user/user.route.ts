@@ -17,5 +17,10 @@ router.post(
 	validateRequest(createUserZodSchema),
 	UserControllers.createUser
 );
+router.patch(
+	"/:id",
+	checkAuth(...Object.values(UserRole)),
+	UserControllers.updateUser
+);
 
 export const UserRoutes = router;
