@@ -34,5 +34,24 @@ const getNewAccessToken = catchAsync(async (req: Request, res: Response) => {
 		data: tokenInfo,
 	});
 });
+const logout = catchAsync(async (req: Request, res: Response) => {
+	res.clearCookie("access_token", {
+		httpOnly: true,
+		secure: false,
+		sameSite: "lax",
+	});
+	res.clearCookie("refresh_token", {
+		httpOnly: true,
+		secure: false,
+		sameSite: "lax",
+	});
 
-export const AuthControllers = { credentialsLogin, getNewAccessToken };
+	sendResponse(res, {
+		statusCode: 200,
+		success: true,
+		message: "User logged out successfully",
+		data: null,
+	});
+});
+
+export const AuthControllers = { credentialsLogin, getNewAccessToken, logout };
