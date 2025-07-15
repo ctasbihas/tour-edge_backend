@@ -53,5 +53,22 @@ const logout = catchAsync(async (req: Request, res: Response) => {
 		data: null,
 	});
 });
+const resetPassword = catchAsync(async (req: Request, res: Response) => {
+	const passwords = req.body;
+	const tokenInfo = req.user;
+	const result = await AuthServices.resetPassword(tokenInfo, passwords);
 
-export const AuthControllers = { credentialsLogin, getNewAccessToken, logout };
+	sendResponse(res, {
+		statusCode: 200,
+		success: true,
+		message: result.message,
+		data: null,
+	});
+});
+
+export const AuthControllers = {
+	credentialsLogin,
+	getNewAccessToken,
+	logout,
+	resetPassword,
+};

@@ -1,4 +1,6 @@
 import bcrypt from "bcryptjs";
+import { JwtPayload } from "jsonwebtoken";
+import { env } from "../../config/env";
 import AppError from "../../errorHelpers/AppError";
 import {
 	createNewAccessTokenWithRefreshToken,
@@ -44,5 +46,40 @@ const getNewAccessToken = async (token: string) => {
 		accessToken: newAccessToken,
 	};
 };
+const resetPassword = async (
+	tokenInfo: JwtPayload,
+	passwords: { oldPassword: string; newPassword: string }
+) => {
+	const user = await User.findById(tokenInfo._id);
+	if (!user) {
+		throw new AppError(404, "User not found");
+	}
+	const isOldPasswordValid = await bcrypt.compare(
+		passwords.oldPassword,
+		user.password as string
+	);
+	if (!isOldPasswordValid) {
+		throw new AppError(401, "Old password is incorrect");
+	}
+	const hashedNewPassword = await bcrypt.hash(
+		passwords.newPassword,
+		Number(env.BCRYPT_SALT_ROUNDS)
+	);
 
-export const AuthServices = { credentialsLogin, getNewAccessToken };
+	const updatedUser = await User.findByIdAndUpdate(
+		user._id,
+		{ password: hashedNewPassword },
+		{ new: true }
+	);
+
+	return {
+		message: "Password updated successfully",
+		user: updatedUser ? updatedUser._id : null,
+	};
+};
+
+export const AuthServices = {
+	credentialsLogin,
+	getNewAccessToken,
+	resetPassword,
+};
