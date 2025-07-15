@@ -1,11 +1,14 @@
 import jwt, { JwtPayload, SignOptions } from "jsonwebtoken";
-import { env } from "../config/env";
 
-export const generateToken = (payload: JwtPayload) => {
-	return jwt.sign(payload, env.JWT_ACCESS_SECRET, {
-		expiresIn: env.JWT_ACCESS_EXPIRES,
+export const generateToken = (
+	payload: JwtPayload,
+	secret: string,
+	expiresIn: string
+) => {
+	return jwt.sign(payload, secret, {
+		expiresIn: expiresIn,
 	} as SignOptions);
 };
-export const verifyToken = (token: string) => {
-	return jwt.verify(token, env.JWT_ACCESS_SECRET) as JwtPayload;
+export const verifyToken = (token: string, secret: string) => {
+	return jwt.verify(token, secret) as JwtPayload;
 };
