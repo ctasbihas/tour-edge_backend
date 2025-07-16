@@ -28,7 +28,7 @@ const createUser = async (payload: Partial<IUser>) => {
 		Number(env.BCRYPT_SALT_ROUNDS)
 	);
 	const authProvider: IAuthProvider = {
-		provider: password ? "credentials" : "google",
+		provider: "credentials",
 		providerId: email as string,
 	};
 
