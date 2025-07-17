@@ -1,15 +1,51 @@
+import bcrypt from "bcryptjs";
 import passport from "passport";
 import {
-	Strategy as GStrategy,
+	Strategy as GoogleStrategy,
 	Profile,
 	VerifyCallback,
 } from "passport-google-oauth20";
+import { Strategy as LocalStrategy } from "passport-local";
 import { UserRole } from "../modules/user/user.interface";
 import { User } from "../modules/user/user.model";
 import { env } from "./env";
 
 passport.use(
-	new GStrategy(
+	new LocalStrategy(
+		{
+			usernameField: "email",
+			passwordField: "password",
+		},
+		async (email: string, password: string, done) => {
+			try {
+				const user = await User.findOne({ email });
+				if (!user) {
+					return done("User not found");
+				}
+
+				if (!user.password) {
+					return done(
+						"This account is linked to Google. Please use Google login."
+					);
+				}
+
+				const isValidPassword = await bcrypt.compare(
+					password,
+					user.password as string
+				);
+				if (!isValidPassword) {
+					return done("Invalid password");
+				}
+
+				return done(null, user);
+			} catch (error) {
+				return done(error, false);
+			}
+		}
+	)
+);
+passport.use(
+	new GoogleStrategy(
 		{
 			clientID: env.GOOGLE_CLIENT_ID,
 			clientSecret: env.GOOGLE_CLIENT_SECRET,

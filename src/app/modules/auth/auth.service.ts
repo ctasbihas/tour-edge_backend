@@ -2,42 +2,9 @@ import bcrypt from "bcryptjs";
 import { JwtPayload } from "jsonwebtoken";
 import { env } from "../../config/env";
 import AppError from "../../errorHelpers/AppError";
-import {
-	createNewAccessTokenWithRefreshToken,
-	createUserTokens,
-} from "../../utils/userTokens";
-import { IUser } from "../user/user.interface";
+import { createNewAccessTokenWithRefreshToken } from "../../utils/userTokens";
 import { User } from "../user/user.model";
 
-const credentialsLogin = async (payload: Partial<IUser>) => {
-	const { email, password } = payload;
-	if (!email || !password) {
-		throw new AppError(400, "Email and Password are required");
-	}
-
-	const user = await User.findOne({ email });
-	if (!user) {
-		throw new AppError(404, "User not found");
-	}
-
-	const { password: hashedPass, ...restUser } = user.toObject();
-
-	const isPasswordValid = await bcrypt.compare(
-		password,
-		hashedPass as string
-	);
-	if (!isPasswordValid) {
-		throw new AppError(401, "Invalid password");
-	}
-
-	const { accessToken, refreshToken } = createUserTokens(user);
-
-	return {
-		accessToken,
-		refreshToken,
-		user: restUser,
-	};
-};
 const getNewAccessToken = async (token: string) => {
 	const newAccessToken = await createNewAccessTokenWithRefreshToken(token);
 
@@ -78,7 +45,6 @@ const resetPassword = async (
 };
 
 export const AuthServices = {
-	credentialsLogin,
 	getNewAccessToken,
 	resetPassword,
 };

@@ -1,5 +1,6 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { JwtPayload } from "jsonwebtoken";
+import passport from "passport";
 import { env } from "../../config/env";
 import AppError from "../../errorHelpers/AppError";
 import { catchAsync } from "../../utils/catchAsync";
@@ -8,18 +9,35 @@ import { setAuthCookie } from "../../utils/setAuthCookie";
 import { createUserTokens } from "../../utils/userTokens";
 import { AuthServices } from "./auth.service";
 
-const credentialsLogin = catchAsync(async (req: Request, res: Response) => {
-	const loginData = await AuthServices.credentialsLogin(req.body);
+const credentialsLogin = catchAsync(
+	async (req: Request, res: Response, next: NextFunction) => {
+		passport.authenticate(
+			"local",
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			async (err: any, user: any) => {
+				if (err) {
+					return next(err);
+				}
+				if (!user) {
+					return next(err);
+				}
 
-	setAuthCookie(res, loginData);
+				const userTokens = createUserTokens(user);
 
-	sendResponse(res, {
-		statusCode: 200,
-		success: true,
-		message: "User logged in successfully",
-		data: loginData,
-	});
-});
+				delete user.toObject().password;
+
+				setAuthCookie(res, userTokens);
+
+				sendResponse(res, {
+					statusCode: 200,
+					success: true,
+					message: "User logged in successfully",
+					data: userTokens,
+				});
+			}
+		)(req, res, next);
+	}
+);
 const getNewAccessToken = catchAsync(async (req: Request, res: Response) => {
 	const token = req.cookies.refresh_token;
 
