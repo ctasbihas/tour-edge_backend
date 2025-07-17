@@ -1,4 +1,3 @@
-import bcrypt from "bcryptjs";
 import passport from "passport";
 import {
 	Strategy as GoogleStrategy,
@@ -8,6 +7,7 @@ import {
 import { Strategy as LocalStrategy } from "passport-local";
 import { UserRole } from "../modules/user/user.interface";
 import { User } from "../modules/user/user.model";
+import { verifyPassword } from "../utils/verifyPassword";
 import { env } from "./env";
 
 passport.use(
@@ -22,18 +22,13 @@ passport.use(
 				if (!user) {
 					return done("User not found");
 				}
-
-				if (!user.password) {
+				const passwordInfo = await verifyPassword(user.email, password);
+				if (!passwordInfo.password) {
 					return done(
 						"This account is linked to Google. Please use Google login."
 					);
 				}
-
-				const isValidPassword = await bcrypt.compare(
-					password,
-					user.password as string
-				);
-				if (!isValidPassword) {
+				if (!passwordInfo.isValid) {
 					return done("Invalid password");
 				}
 

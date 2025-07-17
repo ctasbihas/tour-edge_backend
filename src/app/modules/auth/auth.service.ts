@@ -3,6 +3,7 @@ import { JwtPayload } from "jsonwebtoken";
 import { env } from "../../config/env";
 import AppError from "../../errorHelpers/AppError";
 import { createNewAccessTokenWithRefreshToken } from "../../utils/userTokens";
+import { verifyPassword } from "../../utils/verifyPassword";
 import { User } from "../user/user.model";
 
 const getNewAccessToken = async (token: string) => {
@@ -20,9 +21,9 @@ const resetPassword = async (
 	if (!user) {
 		throw new AppError(404, "User not found");
 	}
-	const isOldPasswordValid = await bcrypt.compare(
-		passwords.oldPassword,
-		user.password as string
+	const isOldPasswordValid = verifyPassword(
+		user.email,
+		passwords.oldPassword
 	);
 	if (!isOldPasswordValid) {
 		throw new AppError(401, "Old password is incorrect");

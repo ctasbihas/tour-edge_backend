@@ -7,17 +7,12 @@ export const seedSuperAdmin = async () => {
 	const superAdmin = await User.findOne({ email: env.SUPER_ADMIN_EMAIL });
 
 	if (!superAdmin) {
-		const user = await UserServices.createUser({
+		await UserServices.createUser({
 			name: "Super Admin",
 			email: env.SUPER_ADMIN_EMAIL,
 			password: env.SUPER_ADMIN_PASSWORD,
 			role: UserRole.SUPER_ADMIN,
 			isVerified: true,
 		});
-
-		console.log(user);
-		console.log("Super Admin seeded successfully.");
-	} else {
-		console.log("Super Admin already exists.");
 	}
 };
