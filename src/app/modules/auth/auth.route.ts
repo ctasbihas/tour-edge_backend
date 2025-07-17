@@ -1,4 +1,5 @@
-import { Router } from "express";
+import { NextFunction, Request, Response, Router } from "express";
+import passport from "passport";
 import { checkAuth } from "../../middlewares/checkAuth";
 import validateRequest from "../../middlewares/validateRequest";
 import { UserRole } from "../user/user.interface";
@@ -19,6 +20,19 @@ router.patch(
 	checkAuth(...Object.values(UserRole)),
 	validateRequest(resetPasswordZodSchema),
 	AuthControllers.resetPassword
+);
+router.get("/google", (req: Request, res: Response, next: NextFunction) => {
+	const redirectTo = req.query.redirect || "/";
+
+	passport.authenticate("google", {
+		scope: ["profile", "email"],
+		state: redirectTo as string,
+	})(req, res, next);
+});
+router.get(
+	"/google/callback",
+	passport.authenticate("google", { failureRedirect: "/login" }),
+	AuthControllers.googleCallback
 );
 
 export const AuthRoutes = router;

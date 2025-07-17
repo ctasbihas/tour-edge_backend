@@ -4,7 +4,7 @@ import { IUser, UserStatus } from "../modules/user/user.interface";
 import { User } from "../modules/user/user.model";
 import { generateToken, verifyToken } from "./jwt";
 
-export const userTokens = (user: Partial<IUser>) => {
+export const createUserTokens = (user: Partial<IUser>) => {
 	const payload = {
 		_id: user._id,
 		email: user.email,

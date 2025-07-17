@@ -1,8 +1,11 @@
 import { Request, Response } from "express";
+import { JwtPayload } from "jsonwebtoken";
+import { env } from "../../config/env";
 import AppError from "../../errorHelpers/AppError";
 import { catchAsync } from "../../utils/catchAsync";
 import sendResponse from "../../utils/response";
 import { setAuthCookie } from "../../utils/setAuthCookie";
+import { createUserTokens } from "../../utils/userTokens";
 import { AuthServices } from "./auth.service";
 
 const credentialsLogin = catchAsync(async (req: Request, res: Response) => {
@@ -55,7 +58,7 @@ const logout = catchAsync(async (req: Request, res: Response) => {
 });
 const resetPassword = catchAsync(async (req: Request, res: Response) => {
 	const passwords = req.body;
-	const tokenInfo = req.user;
+	const tokenInfo = req.user as JwtPayload;
 	const result = await AuthServices.resetPassword(tokenInfo, passwords);
 
 	sendResponse(res, {
@@ -65,10 +68,24 @@ const resetPassword = catchAsync(async (req: Request, res: Response) => {
 		data: null,
 	});
 });
+const googleCallback = catchAsync(async (req: Request, res: Response) => {
+	const redirectTo = req.query.state as string;
+
+	const user = req.user;
+	if (!user) {
+		throw new AppError(401, "User not authenticated");
+	}
+	const tokens = createUserTokens(user);
+
+	setAuthCookie(res, tokens);
+
+	res.redirect(`${env.FRONTEND_URL}${redirectTo}`);
+});
 
 export const AuthControllers = {
 	credentialsLogin,
 	getNewAccessToken,
 	logout,
 	resetPassword,
+	googleCallback,
 };

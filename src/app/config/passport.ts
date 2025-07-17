@@ -4,9 +4,9 @@ import {
 	Profile,
 	VerifyCallback,
 } from "passport-google-oauth20";
-import { env } from "../config/env";
 import { UserRole } from "../modules/user/user.interface";
 import { User } from "../modules/user/user.model";
+import { env } from "./env";
 
 passport.use(
 	new GStrategy(
@@ -57,3 +57,17 @@ passport.use(
 		}
 	)
 );
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+passport.serializeUser((user: any, done) => {
+	done(null, user._id);
+});
+
+passport.deserializeUser(async (id: string, done) => {
+	try {
+		const user = await User.findById(id);
+		done(null, user);
+	} catch (error) {
+		done(error, null);
+	}
+});

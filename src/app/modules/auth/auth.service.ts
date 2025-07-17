@@ -4,7 +4,7 @@ import { env } from "../../config/env";
 import AppError from "../../errorHelpers/AppError";
 import {
 	createNewAccessTokenWithRefreshToken,
-	userTokens,
+	createUserTokens,
 } from "../../utils/userTokens";
 import { IUser } from "../user/user.interface";
 import { User } from "../user/user.model";
@@ -30,8 +30,7 @@ const credentialsLogin = async (payload: Partial<IUser>) => {
 		throw new AppError(401, "Invalid password");
 	}
 
-	const accessToken = userTokens(user).accessToken;
-	const refreshToken = userTokens(user).refreshToken;
+	const { accessToken, refreshToken } = createUserTokens(user);
 
 	return {
 		accessToken,

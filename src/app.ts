@@ -4,6 +4,7 @@ import express, { Request, Response } from "express";
 import expressSession from "express-session";
 import passport from "passport";
 import { env } from "./app/config/env";
+import "./app/config/passport";
 import { globalErrorHandler } from "./app/middlewares/globalErrorHandler";
 import notFound from "./app/middlewares/notFound";
 import { router } from "./app/routes";
@@ -34,5 +35,3 @@ app.use(globalErrorHandler);
 app.use(notFound);
 
 export default app;
-
-/* eeccb2786c4ab7ac0f0dc45b69fe212b9885f36ced1dbef87164c06bc77fe695 */
