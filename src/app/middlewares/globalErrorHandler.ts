@@ -92,7 +92,6 @@ export const globalErrorHandler = (
 		statusCode = duplicateError.statusCode;
 		message = duplicateError.message;
 		errorSources = duplicateError.errorSources;
-		console.log("ERROR: ", err);
 	}
 	// Handle Mongoose Cast errors
 	else if (err instanceof Error.CastError) {
