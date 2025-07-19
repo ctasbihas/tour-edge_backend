@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { JwtPayload } from "jsonwebtoken";
 import { catchAsync } from "../../utils/catchAsync";
 import sendResponse from "../../utils/response";
 import { UserServices } from "./user.service";
@@ -29,7 +30,7 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
 const updateUser = catchAsync(async (req: Request, res: Response) => {
 	const userId = req.params.id;
 	const payload = req.body;
-	const decodedToken = req.user;
+	const decodedToken = req.user as JwtPayload;
 	const user = await UserServices.updateUser(userId, payload, decodedToken);
 
 	sendResponse(res, {

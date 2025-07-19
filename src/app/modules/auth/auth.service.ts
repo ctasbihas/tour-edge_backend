@@ -21,11 +21,8 @@ const resetPassword = async (
 	if (!user) {
 		throw new AppError(404, "User not found");
 	}
-	const isOldPasswordValid = verifyPassword(
-		user.email,
-		passwords.oldPassword
-	);
-	if (!isOldPasswordValid) {
+	const { isValid } = await verifyPassword(user.email, passwords.oldPassword);
+	if (!isValid) {
 		throw new AppError(401, "Old password is incorrect");
 	}
 	const hashedNewPassword = await bcrypt.hash(
