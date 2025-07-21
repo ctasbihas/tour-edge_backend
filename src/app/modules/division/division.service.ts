@@ -35,7 +35,44 @@ const createDivision = async (divisionData: IDivision) => {
 	return newDivision;
 };
 
+const updateDivision = async (id: string, divisionData: IDivision) => {
+	const { name, slug, thumbnail, description } = divisionData;
+	const existingDivision = await Division.findById(id);
+	if (!existingDivision) {
+		throw new AppError(404, "Division not found");
+	}
+	const slugRegex = /^[a-z0-9]+(-[a-z0-9]+)*-division$/;
+	if (slug) {
+		if (!slugRegex.test(slug)) {
+			throw new AppError(
+				400,
+				"Invalid slug format. Slug must contain only lowercase letters, numbers, hyphens, and end with '-division'"
+			);
+		}
+		const slugExists = await Division.findOne({ slug, _id: { $ne: id } });
+		if (slugExists) {
+			throw new AppError(400, "Division with this slug already exists");
+		}
+	}
+
+	const updatedDivision = await Division.findByIdAndUpdate(
+		id,
+		{
+			name,
+			slug,
+			thumbnail,
+			description,
+		},
+		{
+			new: true,
+		}
+	);
+
+	return updatedDivision;
+};
+
 export const DivisionServices = {
 	getDivisions,
 	createDivision,
+	updateDivision,
 };

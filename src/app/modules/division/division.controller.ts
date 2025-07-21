@@ -26,7 +26,20 @@ const createDivision = async (req: Request, res: Response) => {
 	});
 };
 
+const updateDivision = async (req: Request, res: Response) => {
+	const { id } = req.params;
+	const updatedDivision = await DivisionServices.updateDivision(id, req.body);
+
+	sendResponse(res, {
+		statusCode: 200,
+		success: true,
+		message: "Division updated successfully",
+		data: updatedDivision,
+	});
+};
+
 export const DivisionControllers = {
 	getDivisions,
 	createDivision,
+	updateDivision,
 };
