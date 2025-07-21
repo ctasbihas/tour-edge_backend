@@ -1,4 +1,5 @@
 import AppError from "../../errorHelpers/AppError";
+import { Tour } from "../tour/tour.model";
 import { IDivision } from "./division.interface";
 import { Division } from "./division.model";
 
@@ -71,8 +72,27 @@ const updateDivision = async (id: string, divisionData: IDivision) => {
 	return updatedDivision;
 };
 
+const deleteDivision = async (id: string) => {
+	const deletedDivision = await Division.findByIdAndDelete(id);
+	if (!deletedDivision) {
+		throw new AppError(404, "Division not found");
+	}
+	const associatedTours = await Tour.countDocuments({ division: id });
+
+	// TODO: When Tour model is available, handle the error properly.
+	if (associatedTours > 0) {
+		throw new AppError(
+			400,
+			`Cannot delete division. It is associated with ${associatedTours} tour(s). Please remove or reassign these tours first.`
+		);
+	}
+
+	return deletedDivision;
+};
+
 export const DivisionServices = {
 	getDivisions,
 	createDivision,
 	updateDivision,
+	deleteDivision,
 };
