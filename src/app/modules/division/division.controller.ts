@@ -15,7 +15,18 @@ const getDivisions = async (req: Request, res: Response) => {
 		data: divisions.data,
 	});
 };
+const createDivision = async (req: Request, res: Response) => {
+	const newDivision = await DivisionServices.createDivision(req.body);
+
+	sendResponse(res, {
+		statusCode: 201,
+		success: true,
+		message: "Division created successfully",
+		data: newDivision,
+	});
+};
 
 export const DivisionControllers = {
 	getDivisions,
+	createDivision,
 };
