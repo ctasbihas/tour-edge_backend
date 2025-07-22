@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
+import { catchAsync } from "../../utils/catchAsync";
 import sendResponse from "../../utils/response";
 import { TourServices } from "./tour.service";
 
-const getAllTours = async (req: Request, res: Response) => {
+const getAllTours = catchAsync(async (req: Request, res: Response) => {
 	const tours = await TourServices.getAllTours();
 
 	sendResponse(res, {
@@ -11,8 +12,8 @@ const getAllTours = async (req: Request, res: Response) => {
 		message: "Tours retrieved successfully",
 		data: tours,
 	});
-};
-const createTour = async (req: Request, res: Response) => {
+});
+const createTour = catchAsync(async (req: Request, res: Response) => {
 	const newTour = await TourServices.createTour(req.body);
 
 	sendResponse(res, {
@@ -21,9 +22,24 @@ const createTour = async (req: Request, res: Response) => {
 		message: "Tour created successfully",
 		data: newTour,
 	});
-};
+});
+
+const updateTour = catchAsync(async (req: Request, res: Response) => {
+	const { id } = req.params;
+	const updateData = req.body;
+
+	const updatedTour = await TourServices.updateTour(id, updateData);
+
+	sendResponse(res, {
+		statusCode: 200,
+		success: true,
+		message: "Tour updated successfully",
+		data: updatedTour,
+	});
+});
 
 export const TourControllers = {
 	getAllTours,
 	createTour,
+	updateTour,
 };
