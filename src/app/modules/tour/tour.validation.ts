@@ -87,6 +87,15 @@ export const createTourTypeZodSchema = z.object({
 	name: z
 		.string({
 			required_error: "Tour type name is required",
+			invalid_type_error: "Tour type name must be a string",
+		})
+		.min(1, "Tour type name cannot be empty"),
+});
+export const updateTourTypeZodSchema = z.object({
+	name: z
+		.string({
+			required_error: "Tour type name is required",
+			invalid_type_error: "Tour type name must be a string",
 		})
 		.min(1, "Tour type name cannot be empty"),
 });

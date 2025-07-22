@@ -118,6 +118,28 @@ const createTourType = async (payload: ITourType) => {
 	const result = await TourType.create(payload);
 	return result;
 };
+const updateTourType = async (id: string, payload: ITourType) => {
+	const tourType = await TourType.findById(id);
+	if (!tourType) {
+		throw new AppError(404, "Tour type not found");
+	}
+	if (payload.name === tourType.name) {
+		return tourType;
+	}
+	if (payload.name && payload.name !== tourType.name) {
+		const existingTourType = await TourType.findOne({ name: payload.name });
+		if (existingTourType) {
+			throw new AppError(400, "Tour type with this name already exists");
+		}
+	}
+
+	const result = await TourType.findByIdAndUpdate(id, payload, {
+		new: true,
+		runValidators: true,
+	});
+
+	return result;
+};
 
 export const TourServices = {
 	getAllTours,
@@ -126,4 +148,5 @@ export const TourServices = {
 	deleteTour,
 	getAllTourTypes,
 	createTourType,
+	updateTourType,
 };

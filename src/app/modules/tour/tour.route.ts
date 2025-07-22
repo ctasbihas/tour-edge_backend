@@ -6,6 +6,7 @@ import { TourControllers } from "./tour.controller";
 import {
 	createTourTypeZodSchema,
 	createTourZodSchema,
+	updateTourTypeZodSchema,
 	updateTourZodSchema,
 } from "./tour.validation";
 
@@ -41,6 +42,12 @@ router.post(
 	checkAuth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
 	validateRequest(createTourTypeZodSchema),
 	TourControllers.createTourType
+);
+router.patch(
+	"/tour-types/:id",
+	checkAuth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+	validateRequest(updateTourTypeZodSchema),
+	TourControllers.updateTourType
 );
 
 export const TourRoutes = router;
