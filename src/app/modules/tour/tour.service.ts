@@ -83,9 +83,28 @@ const updateTour = async (id: string, updateData: Partial<ITour>) => {
 
 	return updatedTour;
 };
+const deleteTour = async (id: string) => {
+	const tour = await Tour.findById(id);
+	if (!tour) {
+		throw new AppError(404, "Tour not found");
+	}
+
+	// Check if tour is currently active or has future dates
+	const currentDate = new Date();
+	if (tour.startDate && new Date(tour.startDate) > currentDate) {
+		throw new AppError(
+			400,
+			"Cannot delete tour. This tour has future scheduled dates."
+		);
+	}
+
+	const result = await Tour.deleteOne({ _id: id });
+	return result;
+};
 
 export const TourServices = {
 	getAllTours,
 	createTour,
 	updateTour,
+	deleteTour,
 };

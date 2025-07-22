@@ -24,5 +24,10 @@ router.patch(
 	validateRequest(updateTourZodSchema),
 	TourControllers.updateTour
 );
+router.delete(
+	"/:id",
+	checkAuth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+	TourControllers.deleteTour
+);
 
 export const TourRoutes = router;
