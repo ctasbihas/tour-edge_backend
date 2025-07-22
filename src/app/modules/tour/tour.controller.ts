@@ -23,7 +23,6 @@ const createTour = catchAsync(async (req: Request, res: Response) => {
 		data: newTour,
 	});
 });
-
 const updateTour = catchAsync(async (req: Request, res: Response) => {
 	const { id } = req.params;
 	const updateData = req.body;
@@ -50,9 +49,22 @@ const deleteTour = catchAsync(async (req: Request, res: Response) => {
 	});
 });
 
+// Tour Type Controllers
+const getAllTourTypes = catchAsync(async (req: Request, res: Response) => {
+	const result = await TourServices.getAllTourTypes();
+
+	sendResponse(res, {
+		statusCode: 200,
+		success: true,
+		message: "Tour types retrieved successfully",
+		data: result,
+	});
+});
+
 export const TourControllers = {
 	getAllTours,
 	createTour,
 	updateTour,
 	deleteTour,
+	getAllTourTypes,
 };

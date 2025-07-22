@@ -1,7 +1,7 @@
 import AppError from "../../errorHelpers/AppError";
 import { Division } from "../division/division.model";
 import { ITour } from "./tour.interface";
-import { Tour } from "./tour.model";
+import { Tour, TourType } from "./tour.model";
 
 const getAllTours = async () => {
 	const tours = await Tour.find().populate(
@@ -102,9 +102,18 @@ const deleteTour = async (id: string) => {
 	return result;
 };
 
+// Tour Type Services
+const getAllTourTypes = async () => {
+	const result = await TourType.find().sort({
+		createdAt: -1,
+	});
+	return result;
+};
+
 export const TourServices = {
 	getAllTours,
 	createTour,
 	updateTour,
 	deleteTour,
+	getAllTourTypes,
 };

@@ -30,4 +30,7 @@ router.delete(
 	TourControllers.deleteTour
 );
 
+// Tour Type Routes
+router.get("/tour-types", TourControllers.getAllTourTypes);
+
 export const TourRoutes = router;
