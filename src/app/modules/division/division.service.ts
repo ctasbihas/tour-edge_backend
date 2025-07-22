@@ -78,8 +78,6 @@ const deleteDivision = async (id: string) => {
 		throw new AppError(404, "Division not found");
 	}
 	const associatedTours = await Tour.countDocuments({ division: id });
-
-	// TODO: When Tour model is available, handle the error properly.
 	if (associatedTours > 0) {
 		throw new AppError(
 			400,
