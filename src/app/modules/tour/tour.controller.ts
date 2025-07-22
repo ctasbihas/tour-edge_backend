@@ -12,7 +12,18 @@ const getAllTours = async (req: Request, res: Response) => {
 		data: tours,
 	});
 };
+const createTour = async (req: Request, res: Response) => {
+	const newTour = await TourServices.createTour(req.body);
+
+	sendResponse(res, {
+		success: true,
+		statusCode: 201,
+		message: "Tour created successfully",
+		data: newTour,
+	});
+};
 
 export const TourControllers = {
 	getAllTours,
+	createTour,
 };
