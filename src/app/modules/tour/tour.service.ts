@@ -140,6 +140,23 @@ const updateTourType = async (id: string, payload: ITourType) => {
 
 	return result;
 };
+const deleteTourType = async (id: string) => {
+	const tourType = await TourType.findById(id);
+	if (!tourType) {
+		throw new AppError(404, "Tour type not found");
+	}
+
+	const linkedTours = await Tour.find({ tourType: id });
+	if (linkedTours.length > 0) {
+		throw new AppError(
+			400,
+			"Cannot delete tour type. Tours are linked to this tour type."
+		);
+	}
+
+	const result = await TourType.findByIdAndDelete(id);
+	return result;
+};
 
 export const TourServices = {
 	getAllTours,
@@ -149,4 +166,5 @@ export const TourServices = {
 	getAllTourTypes,
 	createTourType,
 	updateTourType,
+	deleteTourType,
 };

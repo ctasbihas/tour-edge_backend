@@ -49,5 +49,10 @@ router.patch(
 	validateRequest(updateTourTypeZodSchema),
 	TourControllers.updateTourType
 );
+router.delete(
+	"/tour-types/:id",
+	checkAuth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+	TourControllers.deleteTourType
+);
 
 export const TourRoutes = router;
