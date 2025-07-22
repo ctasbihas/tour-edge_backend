@@ -1,6 +1,6 @@
 import AppError from "../../errorHelpers/AppError";
 import { Division } from "../division/division.model";
-import { ITour } from "./tour.interface";
+import { ITour, ITourType } from "./tour.interface";
 import { Tour, TourType } from "./tour.model";
 
 const getAllTours = async () => {
@@ -109,6 +109,15 @@ const getAllTourTypes = async () => {
 	});
 	return result;
 };
+const createTourType = async (payload: ITourType) => {
+	const existingTourType = await TourType.findOne({ name: payload.name });
+	if (existingTourType) {
+		throw new AppError(400, "Tour type with this name already exists");
+	}
+
+	const result = await TourType.create(payload);
+	return result;
+};
 
 export const TourServices = {
 	getAllTours,
@@ -116,4 +125,5 @@ export const TourServices = {
 	updateTour,
 	deleteTour,
 	getAllTourTypes,
+	createTourType,
 };

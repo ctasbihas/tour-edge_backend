@@ -53,7 +53,6 @@ export const createTourZodSchema = z.object({
 		})
 		.regex(/^[0-9a-fA-F]{24}$/, "Invalid tour type ObjectId"),
 });
-
 export const updateTourZodSchema = z.object({
 	title: z.string().min(1, "Title cannot be empty").optional(),
 	slug: z.string().min(1, "Slug cannot be empty").optional(),
@@ -81,4 +80,13 @@ export const updateTourZodSchema = z.object({
 		.string()
 		.regex(/^[0-9a-fA-F]{24}$/, "Invalid tour type ObjectId")
 		.optional(),
+});
+
+// This schema is used to validate the request body for creating a tour type
+export const createTourTypeZodSchema = z.object({
+	name: z
+		.string({
+			required_error: "Tour type name is required",
+		})
+		.min(1, "Tour type name cannot be empty"),
 });
