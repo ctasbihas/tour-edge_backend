@@ -4,11 +4,9 @@ import { ITour, ITourType } from "./tour.interface";
 import { Tour, TourType } from "./tour.model";
 
 const getAllTours = async () => {
-	const tours = await Tour.find().populate(
-		"Division",
-		"name slug thumbnail description"
-	);
-	// .populate("tourType", "name description"); // Get tour type details
+	const tours = await Tour.find()
+		.populate("Division", "name slug thumbnail description")
+		.populate("TourType", "name");
 
 	return tours;
 };
@@ -29,27 +27,23 @@ const createTour = async (tourData: ITour) => {
 	return newTour;
 };
 const updateTour = async (id: string, updateData: Partial<ITour>) => {
-	// Check if tour exists
 	const existingTour = await Tour.findById(id);
 	if (!existingTour) {
 		throw new AppError(404, "Tour not found");
 	}
 
-	// Validate division if provided
 	if (updateData.division) {
 		const existingDivision = await Division.findById(updateData.division);
 		if (!existingDivision) {
 			throw new AppError(404, "Division not found");
 		}
 	}
-
-	// TODO: Note: Add tourType validation when TourType model is available
-	// if (updateData.tourType) {
-	// 	const existingTourType = await TourType.findById(updateData.tourType);
-	// 	if (!existingTourType) {
-	// 		throw new AppError(404, "Tour type not found");
-	// 	}
-	// }
+	if (updateData.tourType) {
+		const existingTourType = await TourType.findById(updateData.tourType);
+		if (!existingTourType) {
+			throw new AppError(404, "Tour type not found");
+		}
+	}
 
 	if (updateData.slug) {
 		const tourWithSlug = await Tour.findOne({
@@ -78,8 +72,9 @@ const updateTour = async (id: string, updateData: Partial<ITour>) => {
 	const updatedTour = await Tour.findByIdAndUpdate(id, updateData, {
 		new: true,
 		runValidators: true,
-	}).populate("division", "name slug thumbnail description");
-	// .populate("tourType", "name description");
+	})
+		.populate("Division", "name slug thumbnail description")
+		.populate("TourType", "name");
 
 	return updatedTour;
 };
