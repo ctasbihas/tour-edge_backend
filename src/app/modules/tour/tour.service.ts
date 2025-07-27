@@ -23,6 +23,16 @@ const getAllTours = async (query: Record<string, string>) => {
 		meta,
 	};
 };
+const getTourBySlug = async (slug: string) => {
+	const tour = await Tour.findOne({ slug })
+		.populate("division", "name slug thumbnail description")
+		.populate("tourType", "name");
+	if (!tour) {
+		throw new AppError(404, "Tour not found");
+	}
+
+	return tour;
+};
 const createTour = async (tourData: ITour) => {
 	if (tourData.division) {
 		const existingDivision = await Division.findById(tourData.division);
@@ -143,6 +153,7 @@ const deleteTourType = async (id: string) => {
 
 export const TourServices = {
 	getAllTours,
+	getTourBySlug,
 	createTour,
 	updateTour,
 	deleteTour,
