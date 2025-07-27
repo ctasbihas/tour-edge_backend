@@ -11,6 +11,7 @@ import {
 const router = Router();
 
 router.get("/", DivisionControllers.getDivisions);
+router.get("/:slug", DivisionControllers.getDivisionBySlug);
 router.post(
 	"/create",
 	checkAuth(UserRole.ADMIN, UserRole.SUPER_ADMIN),

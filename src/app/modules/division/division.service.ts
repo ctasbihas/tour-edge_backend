@@ -13,7 +13,14 @@ const getDivisions = async () => {
 		},
 	};
 };
+const getDivisionBySlug = async (slug: string) => {
+	const division = await Division.findOne({ slug });
+	if (!division) {
+		throw new AppError(404, "Division not found");
+	}
 
+	return division;
+};
 const createDivision = async (divisionData: IDivision) => {
 	if (!divisionData.name) {
 		throw new AppError(400, "Division name is required");
@@ -70,6 +77,7 @@ const deleteDivision = async (id: string) => {
 
 export const DivisionServices = {
 	getDivisions,
+	getDivisionBySlug,
 	createDivision,
 	updateDivision,
 	deleteDivision,
