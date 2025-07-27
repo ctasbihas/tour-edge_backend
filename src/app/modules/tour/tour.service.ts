@@ -23,7 +23,7 @@ const getAllTours = async (query: Record<string, string>) => {
 		meta,
 	};
 };
-const getTourBySlug = async (slug: string) => {
+const getSingleTour = async (slug: string) => {
 	const tour = await Tour.findOne({ slug })
 		.populate("division", "name slug thumbnail description")
 		.populate("tourType", "name");
@@ -153,7 +153,7 @@ const deleteTourType = async (id: string) => {
 
 export const TourServices = {
 	getAllTours,
-	getTourBySlug,
+	getSingleTour,
 	createTour,
 	updateTour,
 	deleteTour,

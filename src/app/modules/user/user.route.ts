@@ -15,7 +15,7 @@ router.get(
 router.get(
 	"/:email",
 	checkAuth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
-	UserControllers.getUserByEmail
+	UserControllers.getSingleUser
 );
 router.post(
 	"/register",

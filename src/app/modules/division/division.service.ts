@@ -13,7 +13,7 @@ const getDivisions = async () => {
 		},
 	};
 };
-const getDivisionBySlug = async (slug: string) => {
+const getSingleDivision = async (slug: string) => {
 	const division = await Division.findOne({ slug });
 	if (!division) {
 		throw new AppError(404, "Division not found");
@@ -77,7 +77,7 @@ const deleteDivision = async (id: string) => {
 
 export const DivisionServices = {
 	getDivisions,
-	getDivisionBySlug,
+	getSingleDivision,
 	createDivision,
 	updateDivision,
 	deleteDivision,

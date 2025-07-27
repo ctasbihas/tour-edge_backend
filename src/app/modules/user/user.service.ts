@@ -15,7 +15,7 @@ const getAllUsers = async () => {
 		},
 	};
 };
-const getUserByEmail = async (email: string) => {
+const getSingleUser = async (email: string) => {
 	const user = await User.findOne({ email });
 	if (!user) {
 		throw new AppError(404, "User not found");
@@ -108,7 +108,7 @@ const updateUser = async (
 
 export const UserServices = {
 	getAllUsers,
-	getUserByEmail,
+	getSingleUser,
 	createUser,
 	updateUser,
 };

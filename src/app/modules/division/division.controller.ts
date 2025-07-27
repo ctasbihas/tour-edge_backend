@@ -15,9 +15,9 @@ const getDivisions = async (req: Request, res: Response) => {
 		data: divisions.data,
 	});
 };
-const getDivisionBySlug = async (req: Request, res: Response) => {
+const getSingleDivision = async (req: Request, res: Response) => {
 	const { slug } = req.params;
-	const division = await DivisionServices.getDivisionBySlug(slug);
+	const division = await DivisionServices.getSingleDivision(slug);
 
 	sendResponse(res, {
 		statusCode: 200,
@@ -61,7 +61,7 @@ const deleteDivision = async (req: Request, res: Response) => {
 
 export const DivisionControllers = {
 	getDivisions,
-	getDivisionBySlug,
+	getSingleDivision,
 	createDivision,
 	updateDivision,
 	deleteDivision,
