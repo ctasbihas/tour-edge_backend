@@ -2,7 +2,7 @@ import bcrypt from "bcryptjs";
 import { JwtPayload } from "jsonwebtoken";
 import { env } from "../../config/env";
 import AppError from "../../errorHelpers/AppError";
-import { IAuthProvider, IUser, UserRole } from "./user.interface";
+import { IAuthProvider, IUser, UserRole, UserStatus } from "./user.interface";
 import { User } from "./user.model";
 
 const getAllUsers = async () => {
@@ -14,6 +14,21 @@ const getAllUsers = async () => {
 			total: totalUsers,
 		},
 	};
+};
+const getUserByEmail = async (email: string) => {
+	const user = await User.findOne({ email });
+	if (!user) {
+		throw new AppError(404, "User not found");
+	}
+
+	if (user.isDeleted) {
+		throw new AppError(404, "User not found");
+	}
+	if (user.userStatus !== UserStatus.ACTIVE) {
+		throw new AppError(403, `User is ${user.userStatus}`);
+	}
+
+	return user;
 };
 const createUser = async (payload: Partial<IUser>) => {
 	const { email, password, ...rest } = payload;
@@ -92,7 +107,8 @@ const updateUser = async (
 };
 
 export const UserServices = {
-	createUser,
 	getAllUsers,
+	getUserByEmail,
+	createUser,
 	updateUser,
 };
