@@ -15,57 +15,37 @@ const getDivisions = async () => {
 };
 
 const createDivision = async (divisionData: IDivision) => {
-	const { name, ...rest } = divisionData;
-	if (!name) {
+	if (!divisionData.name) {
 		throw new AppError(400, "Division name is required");
 	}
 
-	const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-") + "-division";
-
-	const existingDivision = await Division.findOne({ slug });
-	if (existingDivision) {
-		throw new AppError(400, "Division with this name already exists");
-	}
-
-	const newDivision = await Division.create({
-		name,
-		...rest,
-		slug,
-	});
+	const newDivision = await Division.create(divisionData);
 
 	return newDivision;
 };
 
 const updateDivision = async (id: string, divisionData: IDivision) => {
-	const { name, slug, thumbnail, description } = divisionData;
 	const existingDivision = await Division.findById(id);
 	if (!existingDivision) {
 		throw new AppError(404, "Division not found");
 	}
-	const slugRegex = /^[a-z0-9]+(-[a-z0-9]+)*-division$/;
-	if (slug) {
-		if (!slugRegex.test(slug)) {
-			throw new AppError(
-				400,
-				"Invalid slug format. Slug must contain only lowercase letters, numbers, hyphens, and end with '-division'"
-			);
-		}
-		const slugExists = await Division.findOne({ slug, _id: { $ne: id } });
-		if (slugExists) {
-			throw new AppError(400, "Division with this slug already exists");
-		}
+
+	const slug =
+		divisionData.name.toLowerCase().split(" ").join("-") + "-division";
+	const existingSlugDivision = await Division.findOne({ slug });
+	if (existingSlugDivision && existingSlugDivision._id.toString() !== id) {
+		throw new AppError(400, "Division with this name already exists");
 	}
 
 	const updatedDivision = await Division.findByIdAndUpdate(
 		id,
 		{
-			name,
+			...divisionData,
 			slug,
-			thumbnail,
-			description,
 		},
 		{
 			new: true,
+			runValidators: true,
 		}
 	);
 

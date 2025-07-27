@@ -9,14 +9,21 @@ import { setAuthCookie } from "../../utils/setAuthCookie";
 import { createUserTokens } from "../../utils/userTokens";
 import { AuthServices } from "./auth.service";
 
+type IInfo = {
+	message: string;
+};
+
 const credentialsLogin = catchAsync(
 	async (req: Request, res: Response, next: NextFunction) => {
 		passport.authenticate(
 			"local",
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			async (err: any, user: any) => {
+			async (err: any, user: any, info: IInfo) => {
 				if (err) {
 					return next(err);
+				}
+				if (info) {
+					return next(new AppError(401, info.message));
 				}
 				if (!user) {
 					return next(err);

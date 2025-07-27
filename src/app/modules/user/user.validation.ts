@@ -32,7 +32,8 @@ export const createUserZodSchema = z.object({
 			invalid_type_error: "Phone number must be a string!!",
 		})
 		.regex(/^(?:\+8801\d{9}|01\d{9})$/, {
-			message: "Invalid phone number format",
+			message:
+				"Invalid phone number format. Number must start with +880 or 01 & must be 11 digits w/o +88",
 		})
 		.optional(),
 	address: z
@@ -69,7 +70,8 @@ export const updateUserZodSchema = z.object({
 			invalid_type_error: "Phone number must be a string!!",
 		})
 		.regex(/^(?:\+8801\d{9}|01\d{9})$/, {
-			message: "Invalid phone number format",
+			message:
+				"Invalid phone number format. Number must start with +880 or 01 & must be 11 digits w/o +88",
 		})
 		.optional(),
 	picture: z
