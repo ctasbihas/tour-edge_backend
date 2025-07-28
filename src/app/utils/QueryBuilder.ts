@@ -62,12 +62,14 @@ export class QueryBuilder<T> {
 
 	async getMeta() {
 		const totalDocs = await this.modelQuery.model.countDocuments();
+		const filteredDocs = await this.modelQuery.clone().countDocuments();
 		const page = Number(this.query.page) || 1;
 		const limit = Number(this.query.limit) || 10;
 		const totalPages = Math.ceil(totalDocs / limit);
 
 		return {
 			total: totalDocs,
+			retrieved: filteredDocs,
 			page,
 			limit,
 			totalPages,

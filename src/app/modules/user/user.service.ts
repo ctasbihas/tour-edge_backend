@@ -2,17 +2,26 @@ import bcrypt from "bcryptjs";
 import { JwtPayload } from "jsonwebtoken";
 import { env } from "../../config/env";
 import AppError from "../../errorHelpers/AppError";
+import { QueryBuilder } from "../../utils/QueryBuilder";
 import { IAuthProvider, IUser, UserRole, UserStatus } from "./user.interface";
 import { User } from "./user.model";
 
-const getAllUsers = async () => {
-	const users = await User.find();
-	const totalUsers = await User.countDocuments();
+const getAllUsers = async (query: Record<string, string>) => {
+	const queryBuilder = new QueryBuilder(User.find(), query);
+	const users = queryBuilder
+		.filter()
+		.search(["email", "name"])
+		.sort()
+		.fields()
+		.paginate();
+	const [data, meta] = await Promise.all([
+		users.build(),
+		queryBuilder.getMeta(),
+	]);
+
 	return {
-		data: users,
-		meta: {
-			total: totalUsers,
-		},
+		data,
+		meta,
 	};
 };
 const getSingleUser = async (email: string) => {
