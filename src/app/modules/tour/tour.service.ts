@@ -1,17 +1,39 @@
 import AppError from "../../errorHelpers/AppError";
+import { QueryBuilder } from "../../utils/QueryBuilder";
 import { Division } from "../division/division.model";
+import { tourSearchFields } from "./tour.constant";
 import { ITour, ITourType } from "./tour.interface";
 import { Tour, TourType } from "./tour.model";
 
-const getAllTours = async () => {
-	const tours = await Tour.find()
-		.populate("Division", "name slug thumbnail description")
-		.populate("TourType", "name");
+const getAllTours = async (query: Record<string, string>) => {
+	const queryBuilder = new QueryBuilder(Tour.find(), query);
+	const tours = await queryBuilder
+		.filter()
+		.search(tourSearchFields)
+		.sort()
+		.fields()
+		.paginate();
+	const [data, meta] = await Promise.all([
+		tours.build(),
+		queryBuilder.getMeta(),
+	]);
 
-	return tours;
+	return {
+		data,
+		meta,
+	};
+};
+const getSingleTour = async (slug: string) => {
+	const tour = await Tour.findOne({ slug })
+		.populate("division", "name slug thumbnail description")
+		.populate("tourType", "name");
+	if (!tour) {
+		throw new AppError(404, "Tour not found");
+	}
+
+	return tour;
 };
 const createTour = async (tourData: ITour) => {
-	const newTour = await Tour.create(tourData);
 	if (tourData.division) {
 		const existingDivision = await Division.findById(tourData.division);
 		if (!existingDivision) {
@@ -19,14 +41,16 @@ const createTour = async (tourData: ITour) => {
 		}
 	}
 	if (tourData.tourType) {
-		const existingTourType = await Division.findById(tourData.tourType);
+		const existingTourType = await TourType.findById(tourData.tourType);
 		if (!existingTourType) {
 			throw new AppError(404, "Tour type not found");
 		}
 	}
+
+	const newTour = await Tour.create(tourData);
 	return newTour;
 };
-const updateTour = async (id: string, updateData: Partial<ITour>) => {
+const updateTour = async (id: string, updateData: ITour) => {
 	const existingTour = await Tour.findById(id);
 	if (!existingTour) {
 		throw new AppError(404, "Tour not found");
@@ -45,36 +69,12 @@ const updateTour = async (id: string, updateData: Partial<ITour>) => {
 		}
 	}
 
-	if (updateData.slug) {
-		const tourWithSlug = await Tour.findOne({
-			slug: updateData.slug,
-			_id: { $ne: id },
-		});
-		if (tourWithSlug) {
-			throw new AppError(400, "Tour with this slug already exists");
-		}
-	}
-
-	if (updateData.title && !updateData.slug) {
-		const autoSlug = updateData.title
-			.toLowerCase()
-			.replace(/[^a-z0-9]+/g, "-");
-		const slugExists = await Tour.findOne({
-			slug: autoSlug,
-			_id: { $ne: id },
-		});
-
-		if (!slugExists) {
-			updateData.slug = autoSlug;
-		}
-	}
-
 	const updatedTour = await Tour.findByIdAndUpdate(id, updateData, {
 		new: true,
 		runValidators: true,
 	})
-		.populate("Division", "name slug thumbnail description")
-		.populate("TourType", "name");
+		.populate("division", "name slug thumbnail description")
+		.populate("tourType", "name");
 
 	return updatedTour;
 };
@@ -99,9 +99,7 @@ const deleteTour = async (id: string) => {
 
 // Tour Type Services
 const getAllTourTypes = async () => {
-	const result = await TourType.find().sort({
-		createdAt: -1,
-	});
+	const result = await TourType.find();
 	return result;
 };
 const createTourType = async (payload: ITourType) => {
@@ -155,6 +153,7 @@ const deleteTourType = async (id: string) => {
 
 export const TourServices = {
 	getAllTours,
+	getSingleTour,
 	createTour,
 	updateTour,
 	deleteTour,

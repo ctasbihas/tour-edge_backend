@@ -5,7 +5,7 @@ import {
 	VerifyCallback,
 } from "passport-google-oauth20";
 import { Strategy as LocalStrategy } from "passport-local";
-import { UserRole } from "../modules/user/user.interface";
+import { UserRole, UserStatus } from "../modules/user/user.interface";
 import { User } from "../modules/user/user.model";
 import { verifyPassword } from "../utils/verifyPassword";
 import { env } from "./env";
@@ -20,16 +20,32 @@ passport.use(
 			try {
 				const user = await User.findOne({ email });
 				if (!user) {
-					return done("User not found");
+					return done(null, false, {
+						message:
+							"User not found. Please register with this email.",
+					});
 				}
 				const passwordInfo = await verifyPassword(user.email, password);
 				if (!passwordInfo.password) {
-					return done(
-						"This account is linked to Google. Please use Google login."
-					);
+					return done(null, false, {
+						message:
+							"This account is linked to Google. Please use Google login.",
+					});
 				}
 				if (!passwordInfo.isValid) {
-					return done("Invalid password");
+					return done(null, false, {
+						message: "Invalid password",
+					});
+				}
+				if (user.isDeleted) {
+					return done(null, false, {
+						message: "User account is suspended.",
+					});
+				}
+				if (user.userStatus !== UserStatus.ACTIVE) {
+					return done(null, false, {
+						message: `This account is ${user.userStatus}. Please contact support.`,
+					});
 				}
 
 				return done(null, user);

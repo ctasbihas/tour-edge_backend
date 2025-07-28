@@ -5,16 +5,26 @@ import sendResponse from "../../utils/response";
 import { UserServices } from "./user.service";
 
 const getAllUsers = catchAsync(async (req: Request, res: Response) => {
-	const result = await UserServices.getAllUsers();
+	const query = req.query as Record<string, string>;
+	const result = await UserServices.getAllUsers(query);
 
 	sendResponse(res, {
 		statusCode: 200,
 		success: true,
 		message: "Users retrieved successfully",
-		meta: {
-			total: result.meta.total,
-		},
 		data: result.data,
+		meta: result.meta,
+	});
+});
+const getSingleUser = catchAsync(async (req: Request, res: Response) => {
+	const email = req.params.email;
+	const user = await UserServices.getSingleUser(email);
+
+	sendResponse(res, {
+		statusCode: 200,
+		success: true,
+		message: "User retrieved successfully",
+		data: user,
 	});
 });
 const createUser = catchAsync(async (req: Request, res: Response) => {
@@ -42,7 +52,8 @@ const updateUser = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const UserControllers = {
-	createUser,
 	getAllUsers,
+	getSingleUser,
+	createUser,
 	updateUser,
 };

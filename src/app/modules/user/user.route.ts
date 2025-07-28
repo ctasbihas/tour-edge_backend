@@ -12,6 +12,11 @@ router.get(
 	checkAuth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
 	UserControllers.getAllUsers
 );
+router.get(
+	"/:email",
+	checkAuth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+	UserControllers.getSingleUser
+);
 router.post(
 	"/register",
 	validateRequest(createUserZodSchema),

@@ -17,6 +17,7 @@ router.get(
 	checkAuth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
 	TourControllers.getAllTours
 );
+router.get("/:slug", TourControllers.getSingleTour);
 router.post(
 	"/create",
 	checkAuth(UserRole.SUPER_ADMIN, UserRole.ADMIN),

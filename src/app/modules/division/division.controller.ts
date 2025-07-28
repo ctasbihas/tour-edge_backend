@@ -15,6 +15,17 @@ const getDivisions = async (req: Request, res: Response) => {
 		data: divisions.data,
 	});
 };
+const getSingleDivision = async (req: Request, res: Response) => {
+	const { slug } = req.params;
+	const division = await DivisionServices.getSingleDivision(slug);
+
+	sendResponse(res, {
+		statusCode: 200,
+		success: true,
+		message: "Division retrieved successfully",
+		data: division,
+	});
+};
 const createDivision = async (req: Request, res: Response) => {
 	const newDivision = await DivisionServices.createDivision(req.body);
 
@@ -25,7 +36,6 @@ const createDivision = async (req: Request, res: Response) => {
 		data: newDivision,
 	});
 };
-
 const updateDivision = async (req: Request, res: Response) => {
 	const { id } = req.params;
 	const updatedDivision = await DivisionServices.updateDivision(id, req.body);
@@ -51,6 +61,7 @@ const deleteDivision = async (req: Request, res: Response) => {
 
 export const DivisionControllers = {
 	getDivisions,
+	getSingleDivision,
 	createDivision,
 	updateDivision,
 	deleteDivision,

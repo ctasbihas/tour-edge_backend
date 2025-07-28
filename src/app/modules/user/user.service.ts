@@ -2,18 +2,42 @@ import bcrypt from "bcryptjs";
 import { JwtPayload } from "jsonwebtoken";
 import { env } from "../../config/env";
 import AppError from "../../errorHelpers/AppError";
-import { IAuthProvider, IUser, UserRole } from "./user.interface";
+import { QueryBuilder } from "../../utils/QueryBuilder";
+import { IAuthProvider, IUser, UserRole, UserStatus } from "./user.interface";
 import { User } from "./user.model";
 
-const getAllUsers = async () => {
-	const users = await User.find();
-	const totalUsers = await User.countDocuments();
+const getAllUsers = async (query: Record<string, string>) => {
+	const queryBuilder = new QueryBuilder(User.find(), query);
+	const users = queryBuilder
+		.filter()
+		.search(["email", "name"])
+		.sort()
+		.fields()
+		.paginate();
+	const [data, meta] = await Promise.all([
+		users.build(),
+		queryBuilder.getMeta(),
+	]);
+
 	return {
-		data: users,
-		meta: {
-			total: totalUsers,
-		},
+		data,
+		meta,
 	};
+};
+const getSingleUser = async (email: string) => {
+	const user = await User.findOne({ email });
+	if (!user) {
+		throw new AppError(404, "User not found");
+	}
+
+	if (user.isDeleted) {
+		throw new AppError(404, "User not found");
+	}
+	if (user.userStatus !== UserStatus.ACTIVE) {
+		throw new AppError(403, `User is ${user.userStatus}`);
+	}
+
+	return user;
 };
 const createUser = async (payload: Partial<IUser>) => {
 	const { email, password, ...rest } = payload;
@@ -92,7 +116,8 @@ const updateUser = async (
 };
 
 export const UserServices = {
-	createUser,
 	getAllUsers,
+	getSingleUser,
+	createUser,
 	updateUser,
 };
