@@ -2,7 +2,7 @@ import bcrypt from "bcryptjs";
 import { User } from "../modules/user/user.model";
 
 export const verifyPassword = async (email: string, password: string) => {
-	const user = await User.findOne({ email }).select("+password");
+	const user = await User.findOne({ email }).select("password");
 
 	if (!user) {
 		throw new Error("User not found");

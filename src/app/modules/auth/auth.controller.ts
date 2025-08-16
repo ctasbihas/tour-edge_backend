@@ -7,6 +7,7 @@ import { catchAsync } from "../../utils/catchAsync";
 import sendResponse from "../../utils/response";
 import { setAuthCookie } from "../../utils/setAuthCookie";
 import { createUserTokens } from "../../utils/userTokens";
+import { IUser } from "../user/user.interface";
 import { AuthServices } from "./auth.service";
 
 type IInfo = {
@@ -18,7 +19,7 @@ const credentialsLogin = catchAsync(
 		passport.authenticate(
 			"local",
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			async (err: any, user: any, info: IInfo) => {
+			async (err: any, user: IUser, info: IInfo) => {
 				if (err) {
 					return next(err);
 				}
@@ -29,16 +30,20 @@ const credentialsLogin = catchAsync(
 					return next(err);
 				}
 
+				if (!user.isVerified) {
+					return sendResponse(res, {
+						statusCode: 401,
+						success: true,
+						message: "Email is not verified. Please verify email.",
+						data: user,
+					});
+				}
 				const userTokens = createUserTokens(user);
-
-				delete user.toObject().password;
-
 				setAuthCookie(res, userTokens);
-
 				sendResponse(res, {
 					statusCode: 200,
 					success: true,
-					message: "User logged in successfully",
+					message: "User login successful",
 					data: userTokens,
 				});
 			}
