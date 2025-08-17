@@ -16,9 +16,6 @@ export const generateTransactionId = () => {
 const createBooking = async (bookingData: IBooking, userId: string) => {
 	const transactionId = generateTransactionId();
 
-	const session = await Booking.startSession();
-	session.startTransaction();
-
 	const user = await User.findById(userId).select("phone address");
 	if (!user?.phone || !user.address) {
 		throw new Error("User phone and address are required");
@@ -31,14 +28,17 @@ const createBooking = async (bookingData: IBooking, userId: string) => {
 		throw new AppError(400, "Tour cost is required");
 	}
 
+	const session = await Booking.startSession();
+	session.startTransaction();
+
 	try {
 		const amount = tour.costFrom * bookingData.guestCount;
 
 		const booking = await Booking.create(
 			[
 				{
-					user: user?._id,
-					tour: tour._id,
+					user: user.id,
+					tour: tour.id,
 					guestCount: bookingData.guestCount,
 				},
 			],
@@ -57,9 +57,9 @@ const createBooking = async (bookingData: IBooking, userId: string) => {
 		);
 
 		const updateBooking = await Booking.findByIdAndUpdate(
-			booking[0]._id,
-			{ payment: payment[0]._id },
-			{ new: true, runValidators: true }
+			booking[0].id,
+			{ payment: payment[0].id },
+			{ new: true, runValidators: true, session }
 		)
 			.populate("user", "name email phone address")
 			.populate("tour", "title costFrom")
