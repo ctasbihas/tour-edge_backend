@@ -1,6 +1,7 @@
 import { randomBytes } from "crypto";
 import AppError from "../../errorHelpers/AppError";
 import { Payment } from "../payment/payment.model";
+import { SSLServices } from "../ssl/ssl.service";
 import { Tour } from "../tour/tour.model";
 import { User } from "../user/user.model";
 import { IBooking } from "./booking.interface";
@@ -64,10 +65,22 @@ const createBooking = async (bookingData: IBooking, userId: string) => {
 			.populate("tour", "title costFrom")
 			.populate("payment");
 
+		const ssl = await SSLServices.SSLPaymentInit({
+			amount,
+			transactionId,
+			name: user.name,
+			email: user.email,
+			address: user.address,
+			phoneNumber: user.phone,
+		});
+
 		await session.commitTransaction();
 		session.endSession();
 
-		return updateBooking;
+		return {
+			paymentUrl: ssl.GatewayPageURL,
+			booking: updateBooking,
+		};
 	} catch (error) {
 		await session.abortTransaction();
 		session.endSession();
