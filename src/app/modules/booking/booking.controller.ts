@@ -1,10 +1,12 @@
 import { Request, Response } from "express";
+import { JwtPayload } from "jsonwebtoken";
 import { catchAsync } from "../../utils/catchAsync";
 import sendResponse from "../../utils/response";
 import { BookingServices } from "./booking.service";
 
 const createBooking = catchAsync(async (req: Request, res: Response) => {
-	const result = await BookingServices.createBooking();
+	const user = req.user as JwtPayload;
+	const result = await BookingServices.createBooking(req.body, user._id);
 
 	sendResponse(res, {
 		statusCode: 201,
