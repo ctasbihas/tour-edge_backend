@@ -1,8 +1,10 @@
 import { randomBytes } from "crypto";
+import { JwtPayload } from "jsonwebtoken";
 import AppError from "../../errorHelpers/AppError";
 import { Payment } from "../payment/payment.model";
 import { SSLServices } from "../ssl/ssl.service";
 import { Tour } from "../tour/tour.model";
+import { UserRole } from "../user/user.interface";
 import { User } from "../user/user.model";
 import { IBooking } from "./booking.interface";
 import { Booking } from "./booking.model";
@@ -103,8 +105,24 @@ const getAllBookings = async () => {
 
 	return bookings;
 };
-const getBookingById = async () => {
-	return {};
+const getBookingById = async (bookingId: string, user: JwtPayload) => {
+	const booking = await Booking.findById(bookingId)
+		.populate("user", "name email role phone address")
+		.populate("tour", "title slug location tourType costFrom")
+		.populate("payment");
+	if (!booking) {
+		throw new AppError(404, "Booking not found");
+	}
+	if (user.role !== UserRole.SUPER_ADMIN && user.role !== UserRole.ADMIN) {
+		if (booking.user.id !== user._id) {
+			throw new AppError(
+				403,
+				"You are not authorized to access this booking"
+			);
+		}
+	}
+
+	return booking;
 };
 const updateBookingStatus = async () => {
 	return {};

@@ -40,7 +40,9 @@ const getAllBookings = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getBookingById = catchAsync(async (req: Request, res: Response) => {
-	const result = await BookingServices.getBookingById();
+	const bookingId = req.params.bookingId;
+	const user = req.user as JwtPayload;
+	const result = await BookingServices.getBookingById(bookingId, user);
 
 	sendResponse(res, {
 		statusCode: 200,
