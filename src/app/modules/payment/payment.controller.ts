@@ -4,9 +4,13 @@ import { catchAsync } from "../../utils/catchAsync";
 import { PaymentServices } from "./payment.service";
 
 const success = catchAsync(async (req: Request, res: Response) => {
-	await PaymentServices.success(req.query as Record<string, string>);
+	const query = req.query as Record<string, string>;
+	const frontendQuery = new URLSearchParams(query).toString();
+	const result = await PaymentServices.success(query);
 
-	res.redirect(`${env.FRONTEND_URL}/payment/success`);
+	if (result.success) {
+		res.redirect(`${env.FRONTEND_URL}/payment/success?${frontendQuery}`);
+	}
 });
 const fail = catchAsync(async (req: Request, res: Response) => {
 	await PaymentServices.fail(req.query as Record<string, string>);

@@ -1,5 +1,45 @@
-const success = (query: Record<string, string>) => {
-	console.log(query);
+import { BookingStatus } from "../booking/booking.interface";
+import { Booking } from "../booking/booking.model";
+import { PaymentStatus } from "./payment.interface";
+import { Payment } from "./payment.model";
+
+const success = async (query: Record<string, string>) => {
+	const { transactionId } = query;
+	const session = await Payment.startSession();
+	session.startTransaction();
+
+	try {
+		const payment = await Payment.findOneAndUpdate(
+			{ transactionId },
+			{ status: PaymentStatus.PAID },
+			{ new: true, session }
+		);
+		if (!payment) {
+			throw new Error("Payment not found");
+		}
+
+		await Booking.findByIdAndUpdate(
+			payment.booking,
+			{
+				status: BookingStatus.COMPLETED,
+			},
+			{ session }
+		);
+
+		await session.commitTransaction();
+		session.endSession();
+
+		return {
+			success: true,
+			message: "Payment successful",
+		};
+	} catch (error) {
+		await session.abortTransaction();
+		session.endSession();
+
+		console.log(error);
+		throw error;
+	}
 };
 const fail = (query: Record<string, string>) => {
 	console.log(query);
