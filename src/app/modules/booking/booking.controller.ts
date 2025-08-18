@@ -17,7 +17,8 @@ const createBooking = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getMyBookings = catchAsync(async (req: Request, res: Response) => {
-	const result = await BookingServices.getMyBookings();
+	const user = req.user as JwtPayload;
+	const result = await BookingServices.getMyBookings(user._id);
 
 	sendResponse(res, {
 		statusCode: 200,

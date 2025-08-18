@@ -88,8 +88,12 @@ const createBooking = async (bookingData: IBooking, userId: string) => {
 		throw error;
 	}
 };
-const getMyBookings = async () => {
-	return {};
+const getMyBookings = async (userId: string) => {
+	const bookings = await Booking.find({ user: userId })
+		.populate("tour", "title costFrom")
+		.populate("payment");
+
+	return bookings;
 };
 const getAllBookings = async () => {
 	return {};
