@@ -41,8 +41,43 @@ const success = async (query: Record<string, string>) => {
 		throw error;
 	}
 };
-const fail = (query: Record<string, string>) => {
-	console.log(query);
+const fail = async (query: Record<string, string>) => {
+	const { transactionId } = query;
+	const session = await Payment.startSession();
+	session.startTransaction();
+
+	try {
+		const payment = await Payment.findOneAndUpdate(
+			{ transactionId },
+			{ status: PaymentStatus.FAILED },
+			{ new: true, session }
+		);
+		if (!payment) {
+			throw new Error("Payment not found");
+		}
+
+		await Booking.findByIdAndUpdate(
+			payment.booking,
+			{
+				status: BookingStatus.FAILED,
+			},
+			{ session }
+		);
+
+		await session.commitTransaction();
+		session.endSession();
+
+		return {
+			success: false,
+			message: "Payment failed",
+		};
+	} catch (error) {
+		await session.abortTransaction();
+		session.endSession();
+
+		console.log(error);
+		throw error;
+	}
 };
 const cancel = (query: Record<string, string>) => {
 	console.log(query);

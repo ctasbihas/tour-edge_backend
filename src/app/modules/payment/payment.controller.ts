@@ -13,9 +13,13 @@ const success = catchAsync(async (req: Request, res: Response) => {
 	}
 });
 const fail = catchAsync(async (req: Request, res: Response) => {
-	await PaymentServices.fail(req.query as Record<string, string>);
+	const query = req.query as Record<string, string>;
+	const frontendQuery = new URLSearchParams(query).toString();
+	const result = await PaymentServices.fail(query);
 
-	res.redirect(`${env.FRONTEND_URL}/payment/fail`);
+	if (!result.success) {
+		res.redirect(`${env.FRONTEND_URL}/payment/fail?${frontendQuery}`);
+	}
 });
 const cancel = catchAsync(async (req: Request, res: Response) => {
 	await PaymentServices.cancel(req.query as Record<string, string>);
