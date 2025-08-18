@@ -53,7 +53,13 @@ const getBookingById = catchAsync(async (req: Request, res: Response) => {
 });
 
 const updateBookingStatus = catchAsync(async (req: Request, res: Response) => {
-	const result = await BookingServices.updateBookingStatus();
+	const bookingId = req.params.bookingId;
+	const user = req.user as JwtPayload;
+	const result = await BookingServices.updateBookingStatus(
+		bookingId,
+		req.body.status,
+		user
+	);
 
 	sendResponse(res, {
 		statusCode: 200,

@@ -6,7 +6,7 @@ import { SSLServices } from "../ssl/ssl.service";
 import { Tour } from "../tour/tour.model";
 import { UserRole } from "../user/user.interface";
 import { User } from "../user/user.model";
-import { IBooking } from "./booking.interface";
+import { BookingStatus, IBooking } from "./booking.interface";
 import { Booking } from "./booking.model";
 
 export const generateTransactionId = () => {
@@ -124,8 +124,28 @@ const getBookingById = async (bookingId: string, user: JwtPayload) => {
 
 	return booking;
 };
-const updateBookingStatus = async () => {
-	return {};
+const updateBookingStatus = async (
+	bookingId: string,
+	status: BookingStatus,
+	user: JwtPayload
+) => {
+	const booking = await Booking.findById(bookingId);
+	if (!booking) {
+		throw new AppError(404, "Booking not found");
+	}
+	if (user.role !== UserRole.SUPER_ADMIN && user.role !== UserRole.ADMIN) {
+		if (booking.user.id !== user._id) {
+			throw new AppError(
+				403,
+				"You are not authorized to access this booking"
+			);
+		}
+	}
+
+	booking.status = status;
+	await booking.save();
+
+	return booking;
 };
 
 export const BookingServices = {
