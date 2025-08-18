@@ -96,7 +96,12 @@ const getMyBookings = async (userId: string) => {
 	return bookings;
 };
 const getAllBookings = async () => {
-	return {};
+	const bookings = await Booking.find()
+		.populate("user", "name email phone address")
+		.populate("tour", "title slug location tourType costFrom")
+		.populate("payment");
+
+	return bookings;
 };
 const getBookingById = async () => {
 	return {};
