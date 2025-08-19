@@ -27,13 +27,17 @@ const getSingleTour = catchAsync(async (req: Request, res: Response) => {
 	});
 });
 const createTour = catchAsync(async (req: Request, res: Response) => {
-	const newTour = await TourServices.createTour(req.body);
+	const payload = {
+		...req.body,
+		images: (req.files as Express.Multer.File[]).map((file) => file.path),
+	};
+	const result = await TourServices.createTour(payload);
 
 	sendResponse(res, {
 		success: true,
 		statusCode: 201,
 		message: "Tour created successfully",
-		data: newTour,
+		data: result,
 	});
 });
 const updateTour = catchAsync(async (req: Request, res: Response) => {
