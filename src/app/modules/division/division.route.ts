@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { multerUpload } from "../../config/multer.config";
 import { checkAuth } from "../../middlewares/checkAuth";
 import validateRequest from "../../middlewares/validateRequest";
 import { UserRole } from "../user/user.interface";
@@ -15,6 +16,7 @@ router.get("/:slug", DivisionControllers.getSingleDivision);
 router.post(
 	"/create",
 	checkAuth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+	multerUpload.single("file"),
 	validateRequest(createDivisionZodSchema),
 	DivisionControllers.createDivision
 );

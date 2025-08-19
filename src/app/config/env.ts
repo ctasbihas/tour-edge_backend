@@ -25,6 +25,11 @@ interface EnvVariables {
 		PAYMENT_API: string;
 		VALIDATION_API: string;
 	};
+	CLOUDINARY: {
+		CLOUD_NAME: string;
+		API_KEY: string;
+		API_SECRET: string;
+	};
 }
 
 const loadEnvs = (): EnvVariables => {
@@ -49,6 +54,9 @@ const loadEnvs = (): EnvVariables => {
 		"SSL_STORE_PASSWORD",
 		"SSL_PAYMENT_API",
 		"SSL_VALIDATION_API",
+		"CLOUDINARY_CLOUD_NAME",
+		"CLOUDINARY_API_KEY",
+		"CLOUDINARY_API_SECRET",
 	];
 	envs.forEach((env) => {
 		if (!process.env[env]) {
@@ -77,6 +85,11 @@ const loadEnvs = (): EnvVariables => {
 			STORE_PASSWORD: process.env.SSL_STORE_PASSWORD as string,
 			PAYMENT_API: process.env.SSL_PAYMENT_API as string,
 			VALIDATION_API: process.env.SSL_VALIDATION_API as string,
+		},
+		CLOUDINARY: {
+			CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME as string,
+			API_KEY: process.env.CLOUDINARY_API_KEY as string,
+			API_SECRET: process.env.CLOUDINARY_API_SECRET as string,
 		},
 	};
 };
