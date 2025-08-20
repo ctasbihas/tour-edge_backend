@@ -44,7 +44,11 @@ const createDivision = async (req: Request, res: Response) => {
 };
 const updateDivision = async (req: Request, res: Response) => {
 	const { id } = req.params;
-	const updatedDivision = await DivisionServices.updateDivision(id, req.body);
+	const payload = {
+		...req.body,
+		thumbnail: req.file?.path,
+	};
+	const updatedDivision = await DivisionServices.updateDivision(id, payload);
 
 	sendResponse(res, {
 		statusCode: 200,

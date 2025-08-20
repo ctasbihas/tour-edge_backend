@@ -32,30 +32,20 @@ const createDivision = async (divisionData: IDivision) => {
 	return newDivision;
 };
 
-const updateDivision = async (id: string, divisionData: IDivision) => {
+const updateDivision = async (id: string, payload: IDivision) => {
 	const existingDivision = await Division.findById(id);
 	if (!existingDivision) {
 		throw new AppError(404, "Division not found");
 	}
 
-	const slug =
-		divisionData.name.toLowerCase().split(" ").join("-") + "-division";
-	const existingSlugDivision = await Division.findOne({ slug });
-	if (existingSlugDivision && existingSlugDivision._id.toString() !== id) {
-		throw new AppError(400, "Division with this name already exists");
+	if (payload.thumbnail && existingDivision.thumbnail) {
+		await deleteCloudinaryImage(existingDivision.thumbnail);
 	}
 
-	const updatedDivision = await Division.findByIdAndUpdate(
-		id,
-		{
-			...divisionData,
-			slug,
-		},
-		{
-			new: true,
-			runValidators: true,
-		}
-	);
+	const updatedDivision = await Division.findByIdAndUpdate(id, payload, {
+		new: true,
+		runValidators: true,
+	});
 
 	return updatedDivision;
 };
