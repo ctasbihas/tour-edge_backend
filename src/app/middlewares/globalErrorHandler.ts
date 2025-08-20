@@ -3,6 +3,7 @@
 import { NextFunction, Request, Response } from "express";
 import { Error } from "mongoose";
 import { ZodError } from "zod";
+import { deleteCloudinaryImage } from "../config/cloudinary.config";
 import AppError from "../errorHelpers/AppError";
 
 // Helper function to handle Zod errors
@@ -68,9 +69,9 @@ const handleDuplicateKeyError = (err: any) => {
 	};
 };
 
-export const globalErrorHandler = (
+export const globalErrorHandler = async (
 	err: any,
-	_req: Request,
+	req: Request,
 	res: Response,
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
 	_next: NextFunction
@@ -78,6 +79,18 @@ export const globalErrorHandler = (
 	let statusCode = 500;
 	let message = "Something went wrong!";
 	let errorSources: { path: string; message: string }[] = [];
+
+	if (req.file) {
+		await deleteCloudinaryImage(req.file.path);
+	}
+
+	if (Array.isArray(req.files) && req.files.length) {
+		await Promise.all(
+			(req.files as Express.Multer.File[]).map((f) =>
+				deleteCloudinaryImage(f.path)
+			)
+		);
+	}
 
 	// Handle Zod validation errors
 	if (err instanceof ZodError) {
