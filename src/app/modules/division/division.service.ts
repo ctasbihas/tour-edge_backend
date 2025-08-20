@@ -1,3 +1,4 @@
+import { deleteCloudinaryImage } from "../../config/cloudinary.config";
 import AppError from "../../errorHelpers/AppError";
 import { Tour } from "../tour/tour.model";
 import { IDivision } from "./division.interface";
@@ -70,6 +71,9 @@ const deleteDivision = async (id: string) => {
 			400,
 			`Cannot delete division. It is associated with ${associatedTours} tour(s). Please remove or reassign these tours first.`
 		);
+	}
+	if (deletedDivision.thumbnail) {
+		await deleteCloudinaryImage(deletedDivision.thumbnail);
 	}
 
 	return deletedDivision;

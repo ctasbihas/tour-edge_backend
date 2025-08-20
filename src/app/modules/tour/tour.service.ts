@@ -1,3 +1,4 @@
+import { deleteCloudinaryImage } from "../../config/cloudinary.config";
 import AppError from "../../errorHelpers/AppError";
 import { QueryBuilder } from "../../utils/QueryBuilder";
 import { Division } from "../division/division.model";
@@ -90,6 +91,12 @@ const deleteTour = async (id: string) => {
 		throw new AppError(
 			400,
 			"Cannot delete tour. This tour has future scheduled dates."
+		);
+	}
+
+	if (Array.isArray(tour.images) && tour.images.length) {
+		await Promise.all(
+			tour.images.map((imageUrl) => deleteCloudinaryImage(imageUrl))
 		);
 	}
 

@@ -42,6 +42,7 @@ router.get(
 router.post(
 	"/create",
 	checkAuth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+	// TODO: Optimize file upload better performance(Upload file right before creating tour)
 	multerUpload.array("files"),
 	validateRequest(createTourZodSchema),
 	TourControllers.createTour
