@@ -23,10 +23,6 @@ const getSingleDivision = async (slug: string) => {
 	return division;
 };
 const createDivision = async (divisionData: IDivision) => {
-	if (!divisionData.name) {
-		throw new AppError(400, "Division name is required");
-	}
-
 	const newDivision = await Division.create(divisionData);
 
 	return newDivision;

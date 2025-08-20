@@ -7,7 +7,8 @@ export const createDivisionZodSchema = z.object({
 		.max(50, "Name must be less than 50 characters"),
 	thumbnail: z
 		.string({ invalid_type_error: "Thumbnail must be a string!!" })
-		.url("Invalid URL format for thumbnail"),
+		.url("Invalid URL format for thumbnail")
+		.optional(),
 	description: z
 		.string({ invalid_type_error: "Description must be a string!!" })
 		.max(500, { message: "Description cannot exceed 500 characters." }),

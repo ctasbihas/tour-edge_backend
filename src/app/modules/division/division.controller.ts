@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
+import { catchAsync } from "../../utils/catchAsync";
 import sendResponse from "../../utils/response";
 import { DivisionServices } from "./division.service";
 
-const getDivisions = async (req: Request, res: Response) => {
+const getDivisions = catchAsync(async (req: Request, res: Response) => {
 	const divisions = await DivisionServices.getDivisions();
 
 	sendResponse(res, {
@@ -14,8 +15,8 @@ const getDivisions = async (req: Request, res: Response) => {
 		},
 		data: divisions.data,
 	});
-};
-const getSingleDivision = async (req: Request, res: Response) => {
+});
+const getSingleDivision = catchAsync(async (req: Request, res: Response) => {
 	const { slug } = req.params;
 	const division = await DivisionServices.getSingleDivision(slug);
 
@@ -25,8 +26,8 @@ const getSingleDivision = async (req: Request, res: Response) => {
 		message: "Division retrieved successfully",
 		data: division,
 	});
-};
-const createDivision = async (req: Request, res: Response) => {
+});
+const createDivision = catchAsync(async (req: Request, res: Response) => {
 	const body = req.body;
 	const file = req.file;
 	const divisionData = {
@@ -41,8 +42,8 @@ const createDivision = async (req: Request, res: Response) => {
 		message: "Division created successfully",
 		data: result,
 	});
-};
-const updateDivision = async (req: Request, res: Response) => {
+});
+const updateDivision = catchAsync(async (req: Request, res: Response) => {
 	const { id } = req.params;
 	const payload = {
 		...req.body,
@@ -56,8 +57,8 @@ const updateDivision = async (req: Request, res: Response) => {
 		message: "Division updated successfully",
 		data: updatedDivision,
 	});
-};
-const deleteDivision = async (req: Request, res: Response) => {
+});
+const deleteDivision = catchAsync(async (req: Request, res: Response) => {
 	const { id } = req.params;
 	const deletedDivision = await DivisionServices.deleteDivision(id);
 
@@ -67,7 +68,7 @@ const deleteDivision = async (req: Request, res: Response) => {
 		message: "Division deleted successfully",
 		data: deletedDivision,
 	});
-};
+});
 
 export const DivisionControllers = {
 	getDivisions,
